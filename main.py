@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 
 from dotenv import load_dotenv
 from telegram import Update
@@ -15,17 +16,22 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def split_text(text):
+    # Split by whitespace and punctuation (keeping the punctuation)
+    return re.findall(r"\w+|[^\w\s]", text)
+
+
 async def copy_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Copy messages from the target user."""
     if update.message:
         if not update.message.text:
             return
         try:
-            if "да" in update.message.text.lower():
+            if "да" == split_text(update.message.text.lower())[-1]:
                 await update.message.reply_text("Золотые слова!")
                 return
 
-            if "нет" in update.message.text.lower():
+            if "нет" == split_text(update.message.text.lower())[-1]:
                 await update.message.reply_text("Крутого мужика ответ!")
                 return
         except Exception as e:
